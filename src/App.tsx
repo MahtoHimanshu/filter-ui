@@ -117,12 +117,8 @@ const App: React.FC<AppProps> = () => {
         <div className="app-container">
             <header className="app-header">
                 <div className="logo-container">
-                    <div className="logo">
-                        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <rect width="32" height="32" rx="4" fill="#E6F4EA" />
-                            <path d="M8 12H16V24H8V12Z" fill="#9BEDB5" />
-                            <path d="M16 8H24V16H16V8Z" fill="#9BEDB5" />
-                        </svg>
+                    <div>
+                        <img src="/group.svg" alt="Logo" />
                     </div>
                     <div className="app-title">
                         <h1>Segwise</h1>
