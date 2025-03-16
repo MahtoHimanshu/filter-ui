@@ -3,7 +3,7 @@ import "./FilterSystem.css";
 import { FaTrash } from "react-icons/fa";
 import { AdData } from "./DataTable.tsx";
 
-// Define filter structure
+
 export interface Filter {
     category: string;
     type: string;
