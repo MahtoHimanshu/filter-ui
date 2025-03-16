@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./FilterSystem.css";
 import { FaTrash } from "react-icons/fa";
-import { AdData } from "../DataTable";
+import { AdData } from "./DataTable.tsx";
 
 // Define filter structure
 export interface Filter {
@@ -17,7 +17,7 @@ interface FilterSystemProps {
     className?: string;
 }
 
-const categories = {
+const categories: Record<string, string[]> = {
     Dimensions: ["Width", "Height", "Depth"],
     Tags: ["Character", "Background", "Elements", "CTA Position", "CTA Text"],
     Metrics: ["ipm", "ctr", "spend", "impressions", "clicks", "cpm", "cost_per_click", "cost_per_install", "installs"],
@@ -73,12 +73,12 @@ const FilterSystem: React.FC<FilterSystemProps> = ({ onFilterChange, data, class
 
     const toggleFilterMenu = () => setIsFilterOpen(!isFilterOpen);
 
-    const handleCategoryChange = (index: number, category: string) => {
-        const type = Object.keys(categories).find((key) => categories[key].includes(category)) || "";
-        const updatedFilters = [...filters];
-        updatedFilters[index] = { ...updatedFilters[index], category, type, operator: "", value: "" };
-        setFilters(updatedFilters);
-    };
+    // const handleCategoryChange = (index: number, category: string) => {
+    //     const type = Object.keys(categories).find((key) => categories[key].includes(category)) || "";
+    //     const updatedFilters = [...filters];
+    //     updatedFilters[index] = { ...updatedFilters[index], category, type, operator: "", value: "" };
+    //     setFilters(updatedFilters);
+    // };
 
     const handleOperatorChange = (index: number, operator: string) => {
         const updatedFilters = [...filters];
