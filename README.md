@@ -1,54 +1,75 @@
-# React + TypeScript + Vite
+# Filter System with Searchable Dropdowns
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Overview
+This React-based **Filter System** allows users to add dynamic filters based on different categories such as **Dimensions, Tags, and Metrics**. It includes:
+- A **searchable filter dropdown** for selecting categories.
+- **Searchable dropdowns** for tag values.
+- Support for **logical operators (AND/OR)** between multiple filters.
+- **Dynamic condition selection** based on the selected category.
 
-Currently, two official plugins are available:
+## Features
+✔ **Searchable filter dropdown** for easy category selection.  
+✔ **Searchable tag value dropdown** for quick value selection.  
+✔ **Supports multiple filters** dynamically.  
+✔ **Logical AND/OR operations** between filters.  
+✔ **Real-time updates** based on selected filters.  
+✔ **Responsive UI** with a clean layout.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Installation
+Make sure you have **Node.js** and **React** installed in your project. Then, follow these steps:
 
-## Expanding the ESLint configuration
+1. Clone the repository or add the component to your project.
+2. Install dependencies (if any):
+   ```sh
+   npm install
+   ```
+3. Import and use the component:
+   ```jsx
+   import FilterSystem from "./FilterSystem";
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+   function App() {
+       return (
+           <div>
+               <h1>Filter System</h1>
+               <FilterSystem />
+           </div>
+       );
+   }
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+   export default App;
+   ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Usage
+1. Click on the **"Add Filters"** button to open the filter dropdown.
+2. **Search and select** a category from Dimensions, Tags, or Metrics.
+3. Choose an **operator** (e.g., Equals, Contains, Greater than).
+4. If the category is a **tag**, you can search within its values before selecting one.
+5. Add multiple filters and define their **AND/OR logic**.
+6. Click the **delete icon (🗑)** to remove a filter.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Filter Categories & Conditions
+- **Dimensions:** Width, Height, Depth.
+- **Tags:** Character, Background, Elements, CTA Position, CTA Text.
+- **Metrics:** Spends, Clicks, Views.
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+Operators vary based on the category type:
+- **Metrics:** Equals, Lesser than, Greater than.
+- **Tags:** is, is not, contains, does not contain.
+
+## Technologies Used
+- **React.js** – for the interactive UI.
+- **CSS** – for styling.
+- **React Icons (FaTrash)** – for the delete button.
+
+## Future Enhancements
+- Integrate with an **API** to fetch dynamic tag values.
+- Support for **date-based filters**.
+- Enhanced **UI animations and transitions**.
+
+## License
+This project is open-source and available under the **MIT License**.
+
+---
+
+### Made with ❤️ in React.js 🚀
+
