@@ -1,0 +1,244 @@
+.filter-system {
+    position: relative;
+    width: 600px;
+    padding: 16px;
+    background-color: rgba(227, 227, 227, 0.6);
+    border-radius: 8px;
+    color: white;
+    font-family: Arial, sans-serif;
+}
+
+.filter-button {
+    padding: 12px;
+    background-color: #ffffff;
+    color: #000000;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.filter-button:hover {
+    background-color: #bfbfbf;
+}
+
+.filter-dropdown {
+    position: absolute;
+    top: 75px;
+    left: 0;
+    width: 100%;
+    background: #333;
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+    z-index: 10;
+}
+
+.filter-tabs {
+    display: flex;
+    justify-content: space-around;
+    border-bottom: 2px solid #444;
+    margin-bottom: 12px;
+}
+
+.filter-tabs button {
+    flex: 1;
+    padding: 10px;
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+    transition: color 0.3s ease, border-bottom 0.3s ease;
+}
+
+.filter-tabs .active {
+    color: #1a73e8;
+    border-bottom: 3px solid #1a73e8;
+    font-weight: bold;
+}
+
+.filter-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 8px 0;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.filter-option {
+    padding: 10px;
+    background: #444;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.filter-option:hover {
+    background: #555;
+}
+
+.selected-filters {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.filter-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    background: #3a3a3a;
+    border-radius: 6px;
+}
+
+.filter-item select,
+.filter-item input,
+.select-selected {
+    background: #555;
+    color: white;
+    border: 1px solid #666;
+    padding: 6px;
+    border-radius: 4px;
+    min-width: 120px;
+}
+
+.filter-item input:focus,
+.filter-item select:focus,
+.search-input:focus {
+    outline: none;
+    border-color: #1a73e8;
+}
+
+.delete-filter {
+    background: none;
+    border: none;
+    color: #ff6b6b;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.delete-filter:hover {
+    color: #ff4d4d;
+}
+
+/* Custom dropdown styles */
+.custom-select {
+    position: relative;
+    width: 180px;
+}
+
+.select-selected {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.select-selected:after {
+    content: "";
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid #fff;
+    position: absolute;
+    right: 10px;
+    top: 14px;
+}
+
+.select-items {
+    position: absolute;
+    background-color: #444;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 99;
+    padding: 10px;
+    margin-top: 4px;
+    border-radius: 4px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+}
+
+.search-input {
+    width: calc(100% - 16px);
+    margin: 8px;
+    padding: 6px;
+    border: 1px solid #666;
+    background: #555;
+    color: white;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.dropdown-options {
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+.option-item {
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.option-item:hover {
+    background-color: #555;
+}
+
+.filter-search {
+    width: 100%;
+    padding: 8px;
+    margin: 8px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.logic-operator {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 8px 0;
+}
+
+.logic-button {
+    padding: 6px 12px;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    font-weight: bold;
+    transition: background 0.3s;
+    background-color: #555;
+    color: white;
+}
+
+.logic-button.active {
+    background-color: #1a73e8;
+}
+
+.value-dropdown {
+    display: flex;
+    flex-direction: column;
+}
+
+.value-search {
+    width: 100%;
+    padding: 6px;
+    margin: 5px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+
