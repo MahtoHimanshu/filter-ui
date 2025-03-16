@@ -135,7 +135,6 @@ const App: React.FC<AppProps> = () => {
                         data={adData}
                     />
                 </div>
-
                 {loading ? (
                     <div className="loading-state">Loading campaign data...</div>
                 ) : error ? (
