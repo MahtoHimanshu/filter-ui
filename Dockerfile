@@ -1,3 +1,2 @@
-# This Dockerfile does nothing
-FROM scratch
-# No commands, no entrypoint, no copy, no run
+FROM alpine:latest
+CMD ["echo", "This is a minimal image."]
