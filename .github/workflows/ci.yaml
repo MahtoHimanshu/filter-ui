@@ -15,18 +15,13 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-        
+
       - name: Build Docker image
-        run: |
-          docker build -t my-app:ci-test -t rohit-ecr/my-app:${{ github.sha }} .
+        run: docker build -t my-app:ci-test .
 
       - name: Ensure curl and bash
         run: |
-          if command -v curl >/dev/null 2>&1 && command -v bash >/dev/null 2>&1; then 
-            echo "curl/bash present"; 
-          else 
-            sudo apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq bash curl ca-certificates; 
-          fi
+          if command -v curl >/dev/null 2>&1 && command -v bash >/dev/null 2>&1; then echo "curl/bash present"; else sudo apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq bash curl ca-certificates; fi
 
       - name: Compute IMAGE_TAG
         run: echo "IMAGE_TAG=rohit-ecr/my-app:${{ github.sha }}" >> $GITHUB_ENV
