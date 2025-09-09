@@ -8,6 +8,10 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      IMAGE_NAME: my-app
+      IMAGE_TAG: ${{ github.sha }}
+      FULL_IMAGE: my-registry/${{ github.repository }}:${{ github.sha }}
 
     steps:
       - name: Checkout repository
@@ -17,4 +21,35 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Build Docker image
-        run: docker build -t my-app:ci-test .
+        run: docker build -t $FULL_IMAGE .
+
+      - name: Check for curl/bash
+        run: |
+          if command -v curl >/dev/null 2>&1 && command -v bash >/dev/null 2>&1; then
+            echo "curl/bash present"
+          else
+            sudo apt-get update -qq && DEBIAN_FRONTEND=noninteractive sudo apt-get install -y -qq bash curl ca-certificates
+          fi
+
+      - name: Install FacetsCTL
+        run: |
+          curl -sSL https://facets-cloud.github.io/facets-schemas/scripts/fctl_install.sh | bash && source ~/.bashrc
+          if ! command -v fctl &> /dev/null; then echo "fctl not found on PATH"; fi
+
+      - name: Persist TOKEN
+        run: echo "TOKEN=${{ secrets.TOKEN }}" >> $GITHUB_ENV
+
+      - name: Persist DOCKER_IMAGE_URL and GIT_REF
+        run: |
+          echo "DOCKER_IMAGE_URL=$FULL_IMAGE" >> $GITHUB_ENV
+          echo "GIT_REF=${{ github.sha }}" >> $GITHUB_ENV
+
+      - name: Register image with FacetsCTL
+        run: |
+          curl -s https://facets-cloud.github.io/facets-schemas/scripts/fctl_register.sh | bash -s -- \
+            -u "himanshu.mahto@facets.cloud" \
+            -c "https://facetsdemo.console.facets.cloud" \
+            -p "pet-clinic-satyendra" \
+            -s "testing-ai" \
+            -a "rohit-ecr" \
+            -i "true"
