@@ -12,6 +12,7 @@ jobs:
     env:
       IMAGE_NAME: my-app
       IMAGE_TAG: ${{ github.sha }}
+      ARTIFACTORY_NAME: rohit-ecr  # Added this - facetsctl needs this
       # Convert repository name to lowercase
       REPO_NAME_LOWER: ${{ github.repository }}
     
@@ -27,23 +28,31 @@ jobs:
         run: echo "repo_lower=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
       
       - name: Build Docker image
-        run: docker build -t my-registry/${{ steps.lowercase.outputs.repo_lower }}:${{ github.sha }} .
+        run: |
+          # Build with the tag that facetsctl expects (based on your error)
+          docker build -t ${{ env.ARTIFACTORY_NAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }} .
+          # Also create your custom registry tag
+          docker tag ${{ env.ARTIFACTORY_NAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }} my-registry/${{ steps.lowercase.outputs.repo_lower }}:${{ github.sha }}
 
+      # FacetsCTL Integration Steps
       - name: Ensure curl and bash
         run: |
-          if command -v curl >/dev/null 2>&1 && command -v bash >/dev/null 2>&1; then echo "curl/bash present"; else sudo apt-get update -qq && DEBIAN_FRONTEND=noninteractive sudo apt-get install -y -qq bash curl ca-certificates; fi
+          if command -v curl >/dev/null 2>&1 && command -v bash >/dev/null 2>&1; then echo "curl/bash present"; else sudo apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq bash curl ca-certificates; fi
 
       - name: Install FacetsCTL
         run: |
           curl -sSL https://facets-cloud.github.io/facets-schemas/scripts/fctl_install.sh | bash && source ~/.bashrc
           if ! command -v fctl &> /dev/null; then echo "fctl not found on PATH"; fi
 
-      - name: Configure FacetsCTL environment
+      - name: Set full IMAGE_TAG
+        run: echo "IMAGE_TAG=${{ env.ARTIFACTORY_NAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}" >> $GITHUB_ENV
+
+      - name: Persist TOKEN
+        run: echo "TOKEN=${{ secrets.TOKEN }}" >> $GITHUB_ENV
+
+      - name: Persist DOCKER_IMAGE_URL and GIT_REF
         run: |
-          echo "TOKEN=${{ secrets.TOKEN }}" >> $GITHUB_ENV
-          echo "REGISTRY=rohit-ecr" >> $GITHUB_ENV
-          echo "IMAGE_TAG=rohit-ecr/${{ env.IMAGE_NAME }}:${{ github.sha }}" >> $GITHUB_ENV
-          echo "DOCKER_IMAGE_URL=rohit-ecr/${{ env.IMAGE_NAME }}:${{ github.sha }}" >> $GITHUB_ENV
+          echo "DOCKER_IMAGE_URL=${{ env.IMAGE_TAG }}" >> $GITHUB_ENV
           echo "GIT_REF=${{ github.sha }}" >> $GITHUB_ENV
 
       - name: Register Docker image with FacetsCTL
