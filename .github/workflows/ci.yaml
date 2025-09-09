@@ -13,39 +13,31 @@ jobs:
         uses: docker/setup-buildx-action@v3
       - name: Build Docker image
         run: docker build -t my-app:ci-test .
-      - name: Set IMAGE_TAG
-        run: |
-          IMAGE_NAME=my-app
-          echo "IMAGE_TAG=facets-artifactory/$IMAGE_NAME:${{ github.sha }}" >> $GITHUB_ENV
-      - name: Ensure curl and bash are available
+      - name: Ensure curl and bash
         run: |
           if command -v curl >/dev/null 2>&1 && command -v bash >/dev/null 2>&1; then
             echo "curl/bash present"
           else
-            sudo apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq bash curl ca-certificates
+            apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq bash curl ca-certificates
           fi
       - name: Install FacetsCTL
         run: |
           curl -sSL https://facets-cloud.github.io/facets-schemas/scripts/fctl_install.sh | bash && source ~/.bashrc
           if ! command -v fctl &> /dev/null; then echo "fctl not found on PATH"; fi
-      - name: Set TOKEN environment variable
+      - name: Set image tag
+        run: echo "IMAGE_TAG=gargar/my-app:${{ github.sha }}" >> $GITHUB_ENV
+      - name: Export TOKEN
         run: echo "TOKEN=${{ secrets.TOKEN }}" >> $GITHUB_ENV
-      - name: Set DOCKER_IMAGE_URL and GIT_REF
+      - name: Export Docker image URL and Git ref
         run: |
           echo "DOCKER_IMAGE_URL=$IMAGE_TAG" >> $GITHUB_ENV
           echo "GIT_REF=${{ github.sha }}" >> $GITHUB_ENV
-      - name: Register image with FacetsCTL
+      - name: Register with FacetsCTL
         run: |
           curl -s https://facets-cloud.github.io/facets-schemas/scripts/fctl_register.sh | bash -s -- \
             -u "himanshu.mahto@facets.cloud" \
             -c "https://facetsdemo.console.facets.cloud" \
             -p "pet-clinic-satyendra" \
             -s "testing-ai" \
-            -a "facets-artifactory" \
+            -a "gargar" \
             -i "true"
-
-
-
-
-
-
