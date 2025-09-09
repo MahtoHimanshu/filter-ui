@@ -23,7 +23,7 @@ jobs:
       - name: Build Docker image
         run: docker build -t $FULL_IMAGE .
 
-      - name: Check for curl/bash
+      - name: Ensure curl and bash are present
         run: |
           if command -v curl >/dev/null 2>&1 && command -v bash >/dev/null 2>&1; then
             echo "curl/bash present"
@@ -34,17 +34,19 @@ jobs:
       - name: Install FacetsCTL
         run: |
           curl -sSL https://facets-cloud.github.io/facets-schemas/scripts/fctl_install.sh | bash && source ~/.bashrc
-          if ! command -v fctl &> /dev/null; then echo "fctl not found on PATH"; fi
+          if ! command -v fctl &> /dev/null; then
+            echo "fctl not found on PATH"
+          fi
 
-      - name: Persist TOKEN
+      - name: Export TOKEN
         run: echo "TOKEN=${{ secrets.TOKEN }}" >> $GITHUB_ENV
 
-      - name: Persist DOCKER_IMAGE_URL and GIT_REF
+      - name: Export DOCKER_IMAGE_URL and GIT_REF
         run: |
           echo "DOCKER_IMAGE_URL=$FULL_IMAGE" >> $GITHUB_ENV
-          echo "GIT_REF=${{ github.sha }}" >> $GITHUB_ENV
+          echo "GIT_REF=$IMAGE_TAG" >> $GITHUB_ENV
 
-      - name: Register image with FacetsCTL
+      - name: Register Docker Image with FacetsCTL
         run: |
           curl -s https://facets-cloud.github.io/facets-schemas/scripts/fctl_register.sh | bash -s -- \
             -u "himanshu.mahto@facets.cloud" \
