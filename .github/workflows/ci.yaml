@@ -8,45 +8,50 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    
     env:
       IMAGE_NAME: my-app
       IMAGE_TAG: ${{ github.sha }}
-
+      # Convert repository name to lowercase
+      REPO_NAME_LOWER: ${{ github.repository }}
+    
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
+      
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-
-      - name: Set lowercase repo name
-        id: repo_name
-        run: echo "REPO_NAME_LC=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
-
+      
+      - name: Convert repository name to lowercase
+        id: lowercase
+        run: echo "repo_lower=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
+      
       - name: Build Docker image
-        run: |
-          FULL_IMAGE="my-registry/${REPO_NAME_LC}:${IMAGE_TAG}"
-          echo "Building image: $FULL_IMAGE"
-          docker build -t "$FULL_IMAGE" .
+        run: docker build -t my-registry/${{ steps.lowercase.outputs.repo_lower }}:${{ github.sha }} .
 
-      - name: Pre-check for curl and bash
+      # FacetsCTL Integration Steps
+      - name: Ensure curl and bash are available
         run: |
-          if command -v curl >/dev/null 2>&1 && command -v bash >/dev/null 2>&1; then echo "curl/bash present"; else apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq bash curl ca-certificates; fi
+          if command -v curl >/dev/null 2>&1 && command -v bash >/dev/null 2>&1; then
+            echo "curl/bash present"
+          else
+            sudo apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq bash curl ca-certificates
+          fi
 
       - name: Install FacetsCTL
         run: |
           curl -sSL https://facets-cloud.github.io/facets-schemas/scripts/fctl_install.sh | bash && source ~/.bashrc
           if ! command -v fctl &> /dev/null; then echo "fctl not found on PATH"; fi
 
-      - name: Set TOKEN for FacetsCTL
+      - name: Export TOKEN
         run: echo "TOKEN=${{ secrets.TOKEN }}" >> $GITHUB_ENV
 
-      - name: Set FacetsCTL environment variables
+      - name: Set image URL and Git ref
         run: |
-          echo "DOCKER_IMAGE_URL=$IMAGE_TAG" >> $GITHUB_ENV
+          echo "DOCKER_IMAGE_URL=${IMAGE_TAG}" >> $GITHUB_ENV
           echo "GIT_REF=${{ github.sha }}" >> $GITHUB_ENV
 
-      - name: Register image with FacetsCTL
+      - name: Register Docker image with FacetsCTL
         run: |
           curl -s https://facets-cloud.github.io/facets-schemas/scripts/fctl_register.sh | bash -s -- \
             -u "himanshu.mahto@facets.cloud" \
