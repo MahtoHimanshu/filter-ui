@@ -17,24 +17,22 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Build Docker image
-        run: docker build -t my-app:${{ github.ref_name }} .
+        run: docker build -t my-app:ci-test .
 
-      - name: Check for curl and bash
+      - name: Check and install curl/bash
         run: |
-          if command -v curl >/dev/null 2>&1 && command -v bash >/dev/null 2>&1; then echo "curl/bash present"; else sudo apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq bash curl ca-certificates; fi
+          if command -v curl >/dev/null 2>&1 && command -v bash >/dev/null 2>&1; then echo "curl/bash present"; else sudo apt-get update -qq && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq bash curl ca-certificates; fi
 
       - name: Install FacetsCTL
         run: |
           curl -sSL https://facets-cloud.github.io/facets-schemas/scripts/fctl_install.sh | bash && source ~/.bashrc
           if ! command -v fctl &> /dev/null; then echo "fctl not found on PATH"; fi
 
-      - name: Set TOKEN
-        run: echo "TOKEN=${{ secrets.TOKEN }}" >> $GITHUB_ENV
-
-      - name: Set Docker environment variables
+      - name: Setup FacetsCTL environment variables
         run: |
-          echo "DOCKER_IMAGE_URL=my-app:${{ github.ref_name }}" >> $GITHUB_ENV
-          echo "GIT_REF=${{ github.ref_name }}" >> $GITHUB_ENV
+          echo "TOKEN=${{ secrets.TOKEN }}" >> $GITHUB_ENV
+          echo "DOCKER_IMAGE_URL=rohit-ecr/my-app:ci-test" >> $GITHUB_ENV
+          echo "GIT_REF=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
 
       - name: Register image with FacetsCTL
         run: |
