@@ -18,31 +18,31 @@ jobs:
 
       - name: Build Docker image
         run: |
-          IMAGE_NAME=my-app
+          IMAGE_NAME="my-app"
           BUILD_TAG=${GITHUB_SHA::8}
-          IMAGE_TAG="${IMAGE_NAME}:${BUILD_TAG}"
-          docker build -t "${IMAGE_TAG}" .
+          DOCKER_IMAGE_URL="rohit-ecr/${IMAGE_NAME}:${BUILD_TAG}"
+          docker build -t ${IMAGE_NAME}:${BUILD_TAG} .
+          docker tag "${IMAGE_NAME}:${BUILD_TAG}" "$DOCKER_IMAGE_URL"
+          echo "IMAGE_NAME=$IMAGE_NAME" >> $GITHUB_ENV
+          echo "BUILD_TAG=$BUILD_TAG" >> $GITHUB_ENV
+          echo "DOCKER_IMAGE_URL=$DOCKER_IMAGE_URL" >> $GITHUB_ENV
+          echo "GIT_REF=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
 
-      - name: Prepare environment for FacetsCTL
+      - name: Ensure curl and bash
         run: |
-          if command -v curl >/dev/null 2>&1 && command -v bash >/dev/null 2>&1; then echo "curl/bash present"; else sudo apt-get update -qq && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq bash curl ca-certificates; fi
+          if command -v curl >/dev/null 2>&1 && command -v bash >/dev/null 2>&1; then
+            echo "curl/bash present"
+          else
+            echo "curl/bash missing"
+          fi
 
       - name: Install FacetsCTL
         run: |
           curl -sSL https://facets-cloud.github.io/facets-schemas/scripts/fctl_install.sh | bash && source ~/.bashrc
           if ! command -v fctl &> /dev/null; then echo "fctl not found on PATH"; fi
 
-      - name: Set TOKEN environment variable
+      - name: Set TOKEN
         run: echo "TOKEN=${{ secrets.TOKEN }}" >> $GITHUB_ENV
-
-      - name: Set DOCKER_IMAGE_URL and GIT_REF
-        run: |
-          IMAGE_NAME=my-app
-          BUILD_TAG=${GITHUB_SHA::8}
-          DOCKER_IMAGE_URL="rohit-ecr/${IMAGE_NAME}:${BUILD_TAG}"
-          echo "DOCKER_IMAGE_URL=${DOCKER_IMAGE_URL}" >> $GITHUB_ENV
-          GIT_REF=${GITHUB_REF##*/}
-          echo "GIT_REF=${GIT_REF}" >> $GITHUB_ENV
 
       - name: Register Docker image with FacetsCTL
         run: |
