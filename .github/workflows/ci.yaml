@@ -47,3 +47,4 @@ jobs:
             -s "testing-ai" \
             -a "rohit-ecr" \
             -i "true"
+      
