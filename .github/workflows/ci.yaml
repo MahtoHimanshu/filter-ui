@@ -19,29 +19,37 @@ jobs:
       - name: Build Docker image
         run: docker build -t my-app:ci-test .
 
-      - name: Set IMAGE_TAG, DOCKER_IMAGE_URL, and GIT_REF
+      - name: Tag Docker image
         run: |
-          IMAGE_TAG="rohit-ecr/${{ github.repository }}:${{ github.sha }}"
+          # Convert repository name to lowercase (handles uppercase issue)
+          REPO_NAME=$(echo "${GITHUB_REPOSITORY##*/}" | tr '[:upper:]' '[:lower:]')
+          IMAGE_TAG="${REPO_NAME}:${GITHUB_SHA}"
+          docker tag my-app:ci-test "$IMAGE_TAG"
+
           echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
           echo "DOCKER_IMAGE_URL=$IMAGE_TAG" >> $GITHUB_ENV
-          echo "GIT_REF=${{ github.ref_name }}" >> $GITHUB_ENV
+          GIT_REF="${GITHUB_REF#refs/heads/}"
+          echo "GIT_REF=$GIT_REF" >> $GITHUB_ENV
 
-      - name: Tag Docker image
-        run: docker tag my-app:ci-test ${{ env.IMAGE_TAG }}
-
-      - name: Check for curl and bash
-        run: |
-          if command -v curl >/dev/null 2>&1 && command -v bash >/dev/null 2>&1; then echo "curl/bash present"; else echo "curl or bash missing"; fi
+      - name: Set up TOKEN
+        run: echo "TOKEN=${{ secrets.TOKEN }}" >> $GITHUB_ENV
 
       - name: Install FacetsCTL
         run: |
-          curl -sSL https://facets-cloud.github.io/facets-schemas/scripts/fctl_install.sh | bash && source ~/.bashrc
-          if ! command -v fctl &> /dev/null; then echo "fctl not found on PATH"; fi
+          if command -v curl >/dev/null 2>&1 && command -v bash >/dev/null 2>&1; then
+            echo "curl/bash present"
+          else
+            sudo apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq bash curl ca-certificates
+          fi
 
-      - name: Setup TOKEN
-        run: echo "TOKEN=${{ secrets.TOKEN }}" >> $GITHUB_ENV
+          curl -sSL https://facets-cloud.github.io/facets-schemas/scripts/fctl_install.sh | bash
+          source ~/.bashrc
 
-      - name: Register image with FacetsCTL
+          if ! command -v fctl &> /dev/null; then
+            echo "fctl not found on PATH"
+          fi
+
+      - name: Register Docker image with FacetsCTL
         run: |
           curl -s https://facets-cloud.github.io/facets-schemas/scripts/fctl_register.sh | bash -s -- \
             -u "satyendra.gola@facets.cloud" \
