@@ -19,25 +19,23 @@ jobs:
       - name: Build Docker image
         run: docker build -t my-app:ci-test .
 
-      - name: Tag image and set environment variables
+      - name: Tag Docker image
         run: |
-          IMAGE_TAG="${GITHUB_SHA}"
-          GIT_REF="${{ github.ref_name }}"
-          FULL_IMAGE="rohit-ecr/my-app:${IMAGE_TAG}"
-          docker tag my-app:ci-test $FULL_IMAGE
-          echo "IMAGE_TAG=$FULL_IMAGE" >> $GITHUB_ENV
-          echo "DOCKER_IMAGE_URL=$FULL_IMAGE" >> $GITHUB_ENV
+          IMAGE_TAG="my-app:${GITHUB_SHA}"
+          docker tag my-app:ci-test "$IMAGE_TAG"
+          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+          echo "DOCKER_IMAGE_URL=$IMAGE_TAG" >> $GITHUB_ENV
+          GIT_REF="${GITHUB_REF#refs/heads/}"
           echo "GIT_REF=$GIT_REF" >> $GITHUB_ENV
 
-      - name: Ensure curl and bash, install FacetsCTL
+      - name: Set up TOKEN
+        run: echo "TOKEN=${{ secrets.TOKEN }}" >> $GITHUB_ENV
+
+      - name: Install FacetsCTL
         run: |
-          if command -v curl >/dev/null 2>&1 && command -v bash >/dev/null 2>&1; then echo "curl/bash present"; else sudo apt-get update -qq && DEBIAN_FRONTEND=noninteractive sudo apt-get install -y -qq bash curl ca-certificates; fi
+          if command -v curl >/dev/null 2>&1 && command -v bash >/dev/null 2>&1; then echo "curl/bash present"; else sudo apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq bash curl ca-certificates; fi
           curl -sSL https://facets-cloud.github.io/facets-schemas/scripts/fctl_install.sh | bash && source ~/.bashrc
           if ! command -v fctl &> /dev/null; then echo "fctl not found on PATH"; fi
-        shell: bash
-
-      - name: Export TOKEN for FacetsCTL
-        run: echo "TOKEN=${{ secrets.TOKEN }}" >> $GITHUB_ENV
 
       - name: Register Docker image with FacetsCTL
         run: |
@@ -48,4 +46,3 @@ jobs:
             -s "testing-ai" \
             -a "rohit-ecr" \
             -i "true"
-        shell: bash
